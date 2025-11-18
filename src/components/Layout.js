@@ -13,17 +13,26 @@ const Header = styled(motion.header)`
   top: 0;
   width: 100%;
   z-index: 1000;
-  background: transparent;
-  mix-blend-mode: difference;
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(10px);
+  transition: background 0.3s ease;
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem 0;
+  }
 `;
 
 const Nav = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 4rem;
+  
+  @media (max-width: 768px) {
+    padding: 0 2rem;
+  }
 `;
 
 const Logo = styled(motion.div)`
@@ -39,17 +48,37 @@ const NavLinks = styled.div`
   display: flex;
   gap: 3rem;
   
+  @media (max-width: 768px) {
+    gap: 2rem;
+  }
+  
   a {
     color: #ffffff;
     text-decoration: none;
     font-weight: 300;
-    font-size: 0.9rem;
-    letter-spacing: 0.1em;
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
     transition: color 0.3s ease;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: #4cc9f0;
+      transition: width 0.3s ease;
+    }
     
     &:hover {
       color: #4cc9f0;
+      
+      &::after {
+        width: 100%;
+      }
     }
   }
 `;

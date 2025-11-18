@@ -45,11 +45,11 @@ function App() {
           >
             <motion.h1 
               style={{ 
-                fontSize: '4rem', 
+                fontSize: 'clamp(2.5rem, 8vw, 5rem)', 
                 fontWeight: 300,
-                marginBottom: '1rem',
+                marginBottom: '1.5rem',
                 letterSpacing: '-0.03em',
-                lineHeight: '0.9'
+                lineHeight: '0.95'
               }}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -61,11 +61,12 @@ function App() {
             </motion.h1>
             <motion.p 
               style={{ 
-                fontSize: '1.1rem', 
+                fontSize: 'clamp(0.9rem, 2vw, 1.2rem)', 
                 fontWeight: 300,
-                opacity: 0.8,
+                opacity: 0.85,
                 letterSpacing: '0.02em',
-                maxWidth: '400px'
+                maxWidth: '500px',
+                lineHeight: '1.6'
               }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -144,7 +145,7 @@ function App() {
               transition={{ delay: 0.3, duration: 1 }}
               viewport={{ once: true }}
               style={{ 
-                fontSize: '2.5rem', 
+                fontSize: 'clamp(2rem, 5vw, 3rem)', 
                 fontWeight: 300,
                 marginBottom: '1.5rem',
                 letterSpacing: '-0.02em'
@@ -159,10 +160,10 @@ function App() {
               transition={{ delay: 0.6, duration: 1 }}
               viewport={{ once: true }}
               style={{ 
-                fontSize: '1rem', 
+                fontSize: 'clamp(0.9rem, 2vw, 1.1rem)', 
                 color: '#a0a0a0',
-                marginBottom: '2rem',
-                lineHeight: '1.6'
+                marginBottom: '2.5rem',
+                lineHeight: '1.7'
               }}
             >
               Ready to bring your vision to life? 
@@ -179,14 +180,18 @@ function App() {
                 href="mailto:hello@studio.com"
                 style={{
                   color: '#4cc9f0',
-                  fontSize: '1rem',
+                  fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
                   textDecoration: 'none',
                   borderBottom: '1px solid #4cc9f0',
-                  paddingBottom: '2px',
+                  paddingBottom: '4px',
                   fontWeight: 300,
-                  letterSpacing: '0.05em'
+                  letterSpacing: '0.05em',
+                  transition: 'all 0.3s ease'
                 }}
-                whileHover={{ color: '#ffffff' }}
+                whileHover={{ 
+                  color: '#ffffff',
+                  borderBottomColor: '#ffffff'
+                }}
                 transition={{ duration: 0.3 }}
               >
                 hello@studio.com
