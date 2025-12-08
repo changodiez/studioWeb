@@ -88,23 +88,23 @@ function App() {
     setIsBurned(burned);
   };
 
-  // Estilos comunes para las tarjetas de indicación
+  // Estilos comunes para las tarjetas de indicación - arriba, pequeño
   const indicatorCardStyle = {
     position: 'absolute',
-    bottom: '3rem',
+    top: '5rem',
     left: '50%',
     transform: 'translateX(-50%)',
     zIndex: 20,
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '1rem 1.5rem',
-    background: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: '8px',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    gap: '0.5rem',
+    padding: '0.5rem 1rem',
+    background: 'rgba(0, 0, 0, 0.6)',
+    borderRadius: '4px',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
     pointerEvents: 'none',
-    minWidth: '200px'
+    whiteSpace: 'nowrap'
   };
 
   return (
@@ -169,39 +169,19 @@ function App() {
             {isMobile && !hasInteracted && (
               <motion.div
                 style={indicatorCardStyle}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                transition={{ delay: 1.5, duration: 0.5 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ delay: 1.5, duration: 0.3 }}
               >
-                <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  style={{ 
-                    fontSize: '2rem',
-                    marginBottom: '0.75rem'
-                  }}
-                >
-                  👆
-                </motion.div>
-                <p style={{ 
-                  color: '#fff',
-                  fontSize: '0.85rem', 
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  textAlign: 'center',
-                  margin: 0
-                }}>
-                  Toca y arrastra
-                </p>
-                <p style={{ 
-                  color: '#888',
+                <span style={{ fontSize: '1rem' }}>👆</span>
+                <span style={{ 
+                  color: '#aaa',
                   fontSize: '0.7rem', 
-                  marginTop: '0.25rem',
-                  textAlign: 'center'
+                  letterSpacing: '0.05em'
                 }}>
-                  para quemar la imagen
-                </p>
+                  Toca y arrastra para crear humo
+                </span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -211,34 +191,19 @@ function App() {
             {isMobile && !canScroll && !isBurned && hasInteracted && (
               <motion.div
                 style={indicatorCardStyle}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
+                exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
               >
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  marginBottom: '0.5rem'
+                <span style={{ fontSize: '0.9rem' }}>🔒</span>
+                <span style={{ 
+                  color: '#aaa',
+                  fontSize: '0.7rem', 
+                  letterSpacing: '0.05em'
                 }}>
-                  <span style={{ fontSize: '1.5rem' }}>🔒</span>
-                  <span style={{ 
-                    color: '#fff',
-                    fontSize: '0.9rem',
-                    fontWeight: '400'
-                  }}>
-                    Scroll bloqueado
-                  </span>
-                </div>
-                <p style={{ 
-                  color: '#888',
-                  fontSize: '0.75rem',
-                  textAlign: 'center',
-                  margin: 0
-                }}>
-                  Quema la imagen para continuar
-                </p>
+                  Quema la imagen para crear humo
+                </span>
               </motion.div>
             )}
           </AnimatePresence>
@@ -248,44 +213,30 @@ function App() {
             {isMobile && canScroll && (
               <motion.div
                 style={indicatorCardStyle}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
               >
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  marginBottom: '0.5rem'
+                <span style={{ fontSize: '0.9rem' }}>🔓</span>
+                <span style={{ 
+                  color: '#4ade80',
+                  fontSize: '0.7rem', 
+                  letterSpacing: '0.05em'
                 }}>
-                  <span style={{ fontSize: '1.5rem' }}>🔓</span>
-                  <span style={{ 
-                    color: '#4ade80',
-                    fontSize: '0.9rem',
-                    fontWeight: '400'
-                  }}>
-                    Desbloqueado
-                  </span>
-                </div>
-                <motion.div
-                  animate={{ y: [0, 5, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
+                  Desbloqueado
+                </span>
+                <motion.span
+                  animate={{ y: [0, 3, 0] }}
+                  transition={{ duration: 1, repeat: Infinity }}
                   style={{ 
-                    color: '#fff',
-                    fontSize: '1.25rem',
-                    marginTop: '0.25rem'
+                    color: '#888',
+                    fontSize: '0.9rem',
+                    marginLeft: '0.25rem'
                   }}
                 >
                   ↓
-                </motion.div>
-                <p style={{ 
-                  color: '#888',
-                  fontSize: '0.7rem',
-                  marginTop: '0.25rem'
-                }}>
-                  Desliza para ver más
-                </p>
+                </motion.span>
               </motion.div>
             )}
           </AnimatePresence>
