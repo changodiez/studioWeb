@@ -30,17 +30,25 @@ function App() {
   useEffect(() => {
     if (!isMobile) {
       document.body.style.overflow = 'auto';
+      document.body.style.touchAction = 'auto';
+      document.documentElement.style.overflow = 'auto';
       return;
     }
 
     if (canScroll) {
       document.body.style.overflow = 'auto';
+      document.body.style.touchAction = 'auto';
+      document.documentElement.style.overflow = 'auto';
     } else {
       document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+      document.documentElement.style.overflow = 'hidden';
     }
 
     return () => {
       document.body.style.overflow = 'auto';
+      document.body.style.touchAction = 'auto';
+      document.documentElement.style.overflow = 'auto';
     };
   }, [canScroll, isMobile]);
 
@@ -88,13 +96,21 @@ function App() {
     setIsBurned(burned);
   };
 
-  // Estilos comunes para las tarjetas de indicación - arriba, pequeño
-  const indicatorCardStyle = {
-    position: 'absolute',
+  // Wrapper para centrar el indicador
+  const indicatorWrapperStyle = {
+    position: 'fixed',
     top: '5rem',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    zIndex: 20,
+    left: '0px',
+    width: '100vw',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+    pointerEvents: 'none'
+  };
+
+  // Estilos de la tarjeta de indicación
+  const indicatorCardStyle = {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -103,7 +119,6 @@ function App() {
     background: 'rgba(0, 0, 0, 0.6)',
     borderRadius: '4px',
     border: '1px solid rgba(255, 255, 255, 0.08)',
-    pointerEvents: 'none',
     whiteSpace: 'nowrap'
   };
 
@@ -120,8 +135,7 @@ function App() {
             height: '100vh', 
             position: 'relative',
             background: '#0a0a0a',
-            touchAction: isMobile && !canScroll ? 'none' : 'pan-y',
-            overflow: 'hidden'
+            overflowX: 'hidden'
           }}
         >
           <Canvas camera={{ position: [0, 0, 3] }}>
@@ -165,82 +179,84 @@ function App() {
             </motion.h1>
           </motion.div>
 
-          {/* Indicador inicial - solo móvil, antes de interactuar */}
-          <AnimatePresence>
-            {isMobile && !hasInteracted && (
-              <motion.div
-                style={indicatorCardStyle}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ delay: 1.5, duration: 0.3 }}
-              >
-                <span style={{ fontSize: '1rem' }}>👆</span>
-                <span style={{ 
-                  color: '#aaa',
-                  fontSize: '0.7rem', 
-                  letterSpacing: '0.05em'
-                }}>
-                  Toca y arrastra para crear humo
-                </span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Indicador bloqueado - móvil, después de interactuar, antes de quemar */}
-          <AnimatePresence>
-            {isMobile && !canScroll && !isBurned && hasInteracted && (
-              <motion.div
-                style={indicatorCardStyle}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                <span style={{ fontSize: '0.9rem' }}>🔒</span>
-                <span style={{ 
-                  color: '#aaa',
-                  fontSize: '0.7rem', 
-                  letterSpacing: '0.05em'
-                }}>
-                  Quema la imagen para crear humo
-                </span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Indicador desbloqueado - móvil, después de quemar */}
-          <AnimatePresence>
-            {isMobile && canScroll && (
-              <motion.div
-                style={indicatorCardStyle}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                <span style={{ fontSize: '0.9rem' }}>🔓</span>
-                <span style={{ 
-                  color: '#4ade80',
-                  fontSize: '0.7rem', 
-                  letterSpacing: '0.05em'
-                }}>
-                  Desbloqueado
-                </span>
-                <motion.span
-                  animate={{ y: [0, 3, 0] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                  style={{ 
-                    color: '#888',
-                    fontSize: '0.9rem',
-                    marginLeft: '0.25rem'
-                  }}
+          {/* Indicadores móvil - wrapper para centrar */}
+          <div style={indicatorWrapperStyle}>
+            <AnimatePresence mode="wait">
+              {/* Indicador inicial - antes de interactuar */}
+              {isMobile && !hasInteracted && (
+                <motion.div
+                  key="initial"
+                  style={indicatorCardStyle}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ delay: 1.5, duration: 0.3 }}
                 >
-                  ↓
-                </motion.span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  <span style={{ fontSize: '1rem' }}>👆</span>
+                  <span style={{ 
+                    color: '#aaa',
+                    fontSize: '0.7rem', 
+                    letterSpacing: '0.05em'
+                  }}>
+                    Toca y arrastra para crear humo
+                  </span>
+                </motion.div>
+              )}
+
+              {/* Indicador bloqueado - después de interactuar, antes de quemar */}
+              {isMobile && !canScroll && !isBurned && hasInteracted && (
+                <motion.div
+                  key="locked"
+                  style={indicatorCardStyle}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <span style={{ fontSize: '0.9rem' }}>🔒</span>
+                  <span style={{ 
+                    color: '#aaa',
+                    fontSize: '0.7rem', 
+                    letterSpacing: '0.05em'
+                  }}>
+                    Crea humo para desbloquear el scroll
+                  </span>
+                </motion.div>
+              )}
+
+              {/* Indicador desbloqueado - después de quemar */}
+              {isMobile && canScroll && (
+                <motion.div
+                  key="unlocked"
+                  style={indicatorCardStyle}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <span style={{ fontSize: '0.9rem' }}>🔓</span>
+                  <span style={{ 
+                    color: '#4ade80',
+                    fontSize: '0.7rem', 
+                    letterSpacing: '0.05em'
+                  }}>
+                    Desbloqueado
+                  </span>
+                  <motion.span
+                    animate={{ y: [0, 3, 0] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                    style={{ 
+                      color: '#888',
+                      fontSize: '0.9rem',
+                      marginLeft: '0.25rem'
+                    }}
+                  >
+                    ↓
+                  </motion.span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
         </section>
 

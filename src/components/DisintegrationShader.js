@@ -424,10 +424,7 @@ const DisintegrationShader = ({ position = [0, 0, 0], scale = 1, onBurnedChange,
       
       if (event.touches.length > 0) {
         const touch = event.touches[0];
-        if (processPointerPosition(touch.clientX, touch.clientY)) {
-          // Prevenir scroll mientras interactúa con la imagen
-          event.preventDefault();
-        }
+        processPointerPosition(touch.clientX, touch.clientY);
       }
     };
 
@@ -437,13 +434,13 @@ const DisintegrationShader = ({ position = [0, 0, 0], scale = 1, onBurnedChange,
       setIsMouseOver(false);
     };
 
-    // Añadir event listeners
+    // Añadir event listeners - todos passive para no bloquear scroll
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
-    window.addEventListener('touchmove', handleTouchMove, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd);
-    window.addEventListener('touchcancel', handleTouchEnd);
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', handleTouchEnd, { passive: true });
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
