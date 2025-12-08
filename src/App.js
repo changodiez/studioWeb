@@ -164,9 +164,9 @@ function App() {
             </motion.h1>
           </motion.div>
 
-          {/* Indicador inicial - antes de interactuar */}
+          {/* Indicador inicial - solo móvil, antes de interactuar */}
           <AnimatePresence>
-            {!hasInteracted && (
+            {isMobile && !hasInteracted && (
               <motion.div
                 style={indicatorCardStyle}
                 initial={{ opacity: 0, y: 20 }}
@@ -174,58 +174,34 @@ function App() {
                 exit={{ opacity: 0, y: 10 }}
                 transition={{ delay: 1.5, duration: 0.5 }}
               >
-                {isMobile ? (
-                  <>
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      style={{ 
-                        fontSize: '2rem',
-                        marginBottom: '0.75rem'
-                      }}
-                    >
-                      👆
-                    </motion.div>
-                    <p style={{ 
-                      color: '#fff',
-                      fontSize: '0.85rem', 
-                      letterSpacing: '0.1em',
-                      textTransform: 'uppercase',
-                      textAlign: 'center',
-                      margin: 0
-                    }}>
-                      Toca y arrastra
-                    </p>
-                    <p style={{ 
-                      color: '#888',
-                      fontSize: '0.7rem', 
-                      marginTop: '0.25rem',
-                      textAlign: 'center'
-                    }}>
-                      para quemar la imagen
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <motion.div
-                      animate={{ y: [0, 8, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                      style={{ 
-                        fontSize: '1.5rem',
-                        color: '#fff'
-                      }}
-                    >
-                      ↓
-                    </motion.div>
-                    <p style={{ 
-                      color: '#888',
-                      fontSize: '0.75rem', 
-                      marginTop: '0.5rem'
-                    }}>
-                      Scroll
-                    </p>
-                  </>
-                )}
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  style={{ 
+                    fontSize: '2rem',
+                    marginBottom: '0.75rem'
+                  }}
+                >
+                  👆
+                </motion.div>
+                <p style={{ 
+                  color: '#fff',
+                  fontSize: '0.85rem', 
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  textAlign: 'center',
+                  margin: 0
+                }}>
+                  Toca y arrastra
+                </p>
+                <p style={{ 
+                  color: '#888',
+                  fontSize: '0.7rem', 
+                  marginTop: '0.25rem',
+                  textAlign: 'center'
+                }}>
+                  para quemar la imagen
+                </p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -314,69 +290,6 @@ function App() {
             )}
           </AnimatePresence>
 
-          {/* Botón de Reset - solo desktop */}
-          <AnimatePresence>
-            {isBurned && !isMobile && (
-              <motion.div
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  zIndex: 20,
-                  textAlign: 'center',
-                  padding: '2rem',
-                  background: 'rgba(0, 0, 0, 0.7)',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(255, 255, 255, 0.1)'
-                }}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.3 }}
-              >
-                <motion.p
-                  style={{
-                    color: '#888',
-                    fontSize: '0.85rem',
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    marginBottom: '1.5rem'
-                  }}
-                >
-                  Sal de la imagen para revelar
-                </motion.p>
-                <motion.button
-                  onClick={() => {
-                    const event = new MouseEvent('mouseleave', {
-                      bubbles: true,
-                      cancelable: true,
-                    });
-                    window.dispatchEvent(event);
-                  }}
-                  style={{
-                    background: 'transparent',
-                    border: '1px solid #555',
-                    color: '#fff',
-                    padding: '0.875rem 2.5rem',
-                    fontSize: '0.85rem',
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    borderRadius: '4px'
-                  }}
-                  whileHover={{ 
-                    borderColor: '#fff',
-                    backgroundColor: 'rgba(255,255,255,0.1)'
-                  }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Nueva imagen
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </section>
 
         {/* Galería de Proyectos */}
