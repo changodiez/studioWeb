@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import styled from 'styled-components';
 
 const LayoutContainer = styled.div`
@@ -17,7 +17,7 @@ const Header = styled(motion.header)`
   backdrop-filter: blur(10px);
   
   @media (max-width: 768px) {
-    padding: 1.25rem 0;
+    padding: 1rem 0;
   }
 `;
 
@@ -41,6 +41,7 @@ const Logo = styled(motion.div)`
   text-transform: uppercase;
   cursor: pointer;
   color: #fff;
+  z-index: 1001;
 `;
 
 const NavLinks = styled.div`
@@ -48,7 +49,7 @@ const NavLinks = styled.div`
   gap: 2.5rem;
   
   @media (max-width: 768px) {
-    gap: 1.5rem;
+    display: none;
   }
   
   a {
@@ -63,6 +64,60 @@ const NavLinks = styled.div`
     &:hover {
       color: #fff;
     }
+  }
+`;
+
+const MenuButton = styled(motion.button)`
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  z-index: 1001;
+  
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+  }
+`;
+
+const MenuLine = styled(motion.span)`
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: #fff;
+  transform-origin: center;
+`;
+
+const MobileMenuOverlay = styled(motion.div)`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 10, 10, 0.98);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+`;
+
+const MobileNavLink = styled(motion.a)`
+  color: #fff;
+  text-decoration: none;
+  font-weight: 300;
+  font-size: 1.5rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+  
+  &:hover {
+    color: #888;
   }
 `;
 
@@ -81,6 +136,17 @@ const Footer = styled(motion.footer)`
 `;
 
 const Layout = ({ children }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
+
+  const menuLinks = [
+    { href: '#inicio', label: 'Inicio' },
+    { href: '#proyectos', label: 'Proyectos' },
+    { href: '#contacto', label: 'Contacto' }
+  ];
+
   return (
     <LayoutContainer>
       <Header
@@ -89,16 +155,58 @@ const Layout = ({ children }) => {
         transition={{ duration: 0.8 }}
       >
         <Nav>
-          <Logo whileHover={{ opacity: 0.7 }}>
+          <Logo whileHover={{ opacity: 0.7 }} onClick={closeMenu}>
             fum
           </Logo>
+          
           <NavLinks>
-            <a href="#inicio">Inicio</a>
-            <a href="#proyectos">Proyectos</a>
-            <a href="#contacto">Contacto</a>
+            {menuLinks.map(link => (
+              <a key={link.href} href={link.href}>{link.label}</a>
+            ))}
           </NavLinks>
+          
+          <MenuButton onClick={toggleMenu} aria-label="Menu">
+            <MenuLine
+              animate={isMenuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+            <MenuLine
+              animate={isMenuOpen ? { opacity: 0 } : { opacity: 1 }}
+              transition={{ duration: 0.2 }}
+            />
+            <MenuLine
+              animate={isMenuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+          </MenuButton>
         </Nav>
       </Header>
+
+      <AnimatePresence>
+        {isMenuOpen && (
+          <MobileMenuOverlay
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {menuLinks.map((link, index) => (
+              <MobileNavLink
+                key={link.href}
+                href={link.href}
+                onClick={closeMenu}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ delay: index * 0.1, duration: 0.3 }}
+              >
+                {link.label}
+              </MobileNavLink>
+            ))}
+          </MobileMenuOverlay>
+        )}
+      </AnimatePresence>
+
       <Main>
         {children}
       </Main>

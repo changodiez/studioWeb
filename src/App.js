@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas } from '@react-three/fiber';
 import { GlobalStyle } from './styles/GlobalStyles';
 import Layout from './components/Layout';
@@ -7,24 +7,128 @@ import DisintegrationShader from './components/DisintegrationShader';
 import ProjectGallery from './components/ProjectGallery';
 
 function App() {
+  const [isMobile, setIsMobile] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [isBurned, setIsBurned] = useState(false);
+  const [canScroll, setCanScroll] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
+  const [shaderKey, setShaderKey] = useState(0);
+  
+  const heroRef = useRef(null);
+
+  // Detectar dispositivo móvil
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Controlar scroll en móvil
+  useEffect(() => {
+    if (!isMobile) {
+      document.body.style.overflow = 'auto';
+      return;
+    }
+
+    if (canScroll) {
+      document.body.style.overflow = 'auto';
+    } else {
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [canScroll, isMobile]);
+
+  // Cuando se quema, habilitar scroll (en móvil)
+  useEffect(() => {
+    if (isBurned && isMobile) {
+      setTimeout(() => {
+        setCanScroll(true);
+      }, 500);
+    }
+  }, [isBurned, isMobile]);
+
+  // Detectar cuando el usuario vuelve al top
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const wasAtTop = isAtTop;
+      const nowAtTop = scrollTop < 100;
+      
+      setIsAtTop(nowAtTop);
+      
+      if (nowAtTop && !wasAtTop && isMobile) {
+        setCanScroll(false);
+        setIsBurned(false);
+        setShaderKey(prev => prev + 1);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isAtTop, isMobile]);
+
+  // Ocultar indicador después de primera interacción
+  useEffect(() => {
+    const hideIndicator = () => setHasInteracted(true);
+    window.addEventListener('touchstart', hideIndicator, { once: true });
+    window.addEventListener('mousemove', hideIndicator, { once: true });
+    return () => {
+      window.removeEventListener('touchstart', hideIndicator);
+      window.removeEventListener('mousemove', hideIndicator);
+    };
+  }, []);
+
+  const handleBurnedChange = (burned) => {
+    setIsBurned(burned);
+  };
+
+  // Estilos comunes para las tarjetas de indicación
+  const indicatorCardStyle = {
+    position: 'absolute',
+    bottom: '3rem',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 20,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '1rem 1.5rem',
+    background: 'rgba(0, 0, 0, 0.7)',
+    borderRadius: '8px',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    pointerEvents: 'none',
+    minWidth: '200px'
+  };
+
   return (
     <>
       <GlobalStyle />
       <Layout>
         {/* Hero Section con shader de humo */}
         <section 
+          ref={heroRef}
           id="inicio" 
           style={{ 
             width: '100vw', 
             height: '100vh', 
             position: 'relative',
-            background: '#0a0a0a'
+            background: '#0a0a0a',
+            touchAction: isMobile && !canScroll ? 'none' : 'pan-y'
           }}
         >
           <Canvas camera={{ position: [0, 0, 3] }}>
-            <DisintegrationShader
-              image="https://picsum.photos/1920/1080?grayscale&random=100"
-              scale={2.2}
+            <DisintegrationShader 
+              key={shaderKey}
+              scale={2.2} 
+              onBurnedChange={handleBurnedChange}
+              disableTouch={isMobile && canScroll}
             />
           </Canvas>
           
@@ -33,9 +137,10 @@ function App() {
             style={{
               position: 'absolute',
               bottom: '4rem',
-              left: '4rem',
+              left: '2rem',
               color: 'white',
-              zIndex: 10
+              zIndex: 10,
+              pointerEvents: 'none'
             }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -43,7 +148,7 @@ function App() {
           >
             <motion.h1 
               style={{ 
-                fontSize: 'clamp(2rem, 6vw, 4rem)', 
+                fontSize: 'clamp(1.8rem, 5vw, 4rem)', 
                 fontWeight: 300,
                 marginBottom: '1rem',
                 letterSpacing: '-0.02em',
@@ -59,29 +164,219 @@ function App() {
             </motion.h1>
           </motion.div>
 
-          {/* Scroll Indicator */}
-          <motion.div
-            style={{
-              position: 'absolute',
-              bottom: '2rem',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              color: '#444',
-              zIndex: 10,
-              textAlign: 'center'
-            }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 2 }}
-          >
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              style={{ fontSize: '1rem' }}
-            >
-              ↓
-            </motion.div>
-          </motion.div>
+          {/* Indicador inicial - antes de interactuar */}
+          <AnimatePresence>
+            {!hasInteracted && (
+              <motion.div
+                style={indicatorCardStyle}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ delay: 1.5, duration: 0.5 }}
+              >
+                {isMobile ? (
+                  <>
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                      style={{ 
+                        fontSize: '2rem',
+                        marginBottom: '0.75rem'
+                      }}
+                    >
+                      👆
+                    </motion.div>
+                    <p style={{ 
+                      color: '#fff',
+                      fontSize: '0.85rem', 
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      textAlign: 'center',
+                      margin: 0
+                    }}>
+                      Toca y arrastra
+                    </p>
+                    <p style={{ 
+                      color: '#888',
+                      fontSize: '0.7rem', 
+                      marginTop: '0.25rem',
+                      textAlign: 'center'
+                    }}>
+                      para quemar la imagen
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <motion.div
+                      animate={{ y: [0, 8, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      style={{ 
+                        fontSize: '1.5rem',
+                        color: '#fff'
+                      }}
+                    >
+                      ↓
+                    </motion.div>
+                    <p style={{ 
+                      color: '#888',
+                      fontSize: '0.75rem', 
+                      marginTop: '0.5rem'
+                    }}>
+                      Scroll
+                    </p>
+                  </>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Indicador bloqueado - móvil, después de interactuar, antes de quemar */}
+          <AnimatePresence>
+            {isMobile && !canScroll && !isBurned && hasInteracted && (
+              <motion.div
+                style={indicatorCardStyle}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  marginBottom: '0.5rem'
+                }}>
+                  <span style={{ fontSize: '1.5rem' }}>🔒</span>
+                  <span style={{ 
+                    color: '#fff',
+                    fontSize: '0.9rem',
+                    fontWeight: '400'
+                  }}>
+                    Scroll bloqueado
+                  </span>
+                </div>
+                <p style={{ 
+                  color: '#888',
+                  fontSize: '0.75rem',
+                  textAlign: 'center',
+                  margin: 0
+                }}>
+                  Quema la imagen para continuar
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Indicador desbloqueado - móvil, después de quemar */}
+          <AnimatePresence>
+            {isMobile && canScroll && (
+              <motion.div
+                style={indicatorCardStyle}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  marginBottom: '0.5rem'
+                }}>
+                  <span style={{ fontSize: '1.5rem' }}>🔓</span>
+                  <span style={{ 
+                    color: '#4ade80',
+                    fontSize: '0.9rem',
+                    fontWeight: '400'
+                  }}>
+                    Desbloqueado
+                  </span>
+                </div>
+                <motion.div
+                  animate={{ y: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                  style={{ 
+                    color: '#fff',
+                    fontSize: '1.25rem',
+                    marginTop: '0.25rem'
+                  }}
+                >
+                  ↓
+                </motion.div>
+                <p style={{ 
+                  color: '#888',
+                  fontSize: '0.7rem',
+                  marginTop: '0.25rem'
+                }}>
+                  Desliza para ver más
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Botón de Reset - solo desktop */}
+          <AnimatePresence>
+            {isBurned && !isMobile && (
+              <motion.div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 20,
+                  textAlign: 'center',
+                  padding: '2rem',
+                  background: 'rgba(0, 0, 0, 0.7)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)'
+                }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.p
+                  style={{
+                    color: '#888',
+                    fontSize: '0.85rem',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    marginBottom: '1.5rem'
+                  }}
+                >
+                  Sal de la imagen para revelar
+                </motion.p>
+                <motion.button
+                  onClick={() => {
+                    const event = new MouseEvent('mouseleave', {
+                      bubbles: true,
+                      cancelable: true,
+                    });
+                    window.dispatchEvent(event);
+                  }}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid #555',
+                    color: '#fff',
+                    padding: '0.875rem 2.5rem',
+                    fontSize: '0.85rem',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    borderRadius: '4px'
+                  }}
+                  whileHover={{ 
+                    borderColor: '#fff',
+                    backgroundColor: 'rgba(255,255,255,0.1)'
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Nueva imagen
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
 
         {/* Galería de Proyectos */}
