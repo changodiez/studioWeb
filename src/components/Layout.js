@@ -8,17 +8,16 @@ const LayoutContainer = styled.div`
 `;
 
 const Header = styled(motion.header)`
-  padding: 2rem 0;
+  padding: 1.5rem 0;
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 1000;
-  background: rgba(10, 10, 10, 0.8);
+  background: rgba(10, 10, 10, 0.9);
   backdrop-filter: blur(10px);
-  transition: background 0.3s ease;
   
   @media (max-width: 768px) {
-    padding: 1.5rem 0;
+    padding: 1.25rem 0;
   }
 `;
 
@@ -28,57 +27,41 @@ const Nav = styled.nav`
   align-items: center;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 4rem;
+  padding: 0 3rem;
   
   @media (max-width: 768px) {
-    padding: 0 2rem;
+    padding: 0 1.5rem;
   }
 `;
 
 const Logo = styled(motion.div)`
-  font-size: 1rem;
+  font-size: 1.25rem;
   font-weight: 300;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   cursor: pointer;
-  color: white;
+  color: #fff;
 `;
 
 const NavLinks = styled.div`
   display: flex;
-  gap: 3rem;
+  gap: 2.5rem;
   
   @media (max-width: 768px) {
-    gap: 2rem;
+    gap: 1.5rem;
   }
   
   a {
-    color: #ffffff;
+    color: #888;
     text-decoration: none;
     font-weight: 300;
-    font-size: 0.85rem;
-    letter-spacing: 0.15em;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     transition: color 0.3s ease;
-    position: relative;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 0;
-      height: 1px;
-      background: #4cc9f0;
-      transition: width 0.3s ease;
-    }
     
     &:hover {
-      color: #4cc9f0;
-      
-      &::after {
-        width: 100%;
-      }
+      color: #fff;
     }
   }
 `;
@@ -90,10 +73,11 @@ const Main = styled.main`
 const Footer = styled(motion.footer)`
   padding: 2rem 0;
   text-align: center;
-  color: #666;
-  font-size: 0.8rem;
+  color: #444;
+  font-size: 0.75rem;
   letter-spacing: 0.1em;
   background: #0a0a0a;
+  border-top: 1px solid #1a1a1a;
 `;
 
 const Layout = ({ children }) => {
@@ -102,18 +86,16 @@ const Layout = ({ children }) => {
       <Header
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 1 }}
+        transition={{ duration: 0.8 }}
       >
         <Nav>
-          <Logo
-            whileHover={{ scale: 1.05 }}
-          >
-            Studio
+          <Logo whileHover={{ opacity: 0.7 }}>
+            fum
           </Logo>
           <NavLinks>
-            <a href="#inicio">Home</a>
-            <a href="#proyectos">Work</a>
-            <a href="#contacto">Contact</a>
+            <a href="#inicio">Inicio</a>
+            <a href="#proyectos">Proyectos</a>
+            <a href="#contacto">Contacto</a>
           </NavLinks>
         </Nav>
       </Header>
@@ -123,9 +105,9 @@ const Layout = ({ children }) => {
       <Footer
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2, duration: 1 }}
+        transition={{ delay: 1.5, duration: 0.8 }}
       >
-        <p>&copy; 2024 Studio. All rights reserved.</p>
+        <p>© 2025 fum Studio</p>
       </Footer>
     </LayoutContainer>
   );

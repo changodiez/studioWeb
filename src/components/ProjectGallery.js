@@ -6,104 +6,98 @@ import ProjectDetail from './ProjectDetail';
 const GallerySection = styled.section`
   width: 100%;
   background: #0a0a0a;
-  padding: 0;
-`;
-
-const ProjectList = styled.div`
-  width: 100%;
-`;
-
-const ProjectItem = styled(motion.div)`
-  width: 100%;
-  border-bottom: 1px solid #333;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: background-color 0.3s ease;
-`;
-
-const ProjectLink = styled.div`
-  display: block;
-  text-decoration: none;
-  color: inherit;
-  padding: 4rem 2rem;
+  padding: 8rem 2rem;
   
   @media (max-width: 768px) {
-    padding: 3rem 1.5rem;
+    padding: 4rem 1rem;
   }
 `;
 
-const ProjectContent = styled.div`
+const GalleryHeader = styled(motion.div)`
+  max-width: 1200px;
+  margin: 0 auto 4rem;
+  
+  @media (max-width: 768px) {
+    margin-bottom: 3rem;
+  }
+`;
+
+const SectionTitle = styled.h2`
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: #666;
+  margin-bottom: 0.5rem;
+`;
+
+const GalleryGrid = styled.div`
   max-width: 1200px;
   margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+`;
+
+const ProjectCard = styled(motion.article)`
+  cursor: pointer;
+  position: relative;
+`;
+
+const ImageContainer = styled(motion.div)`
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #111;
+  margin-bottom: 1rem;
+`;
+
+const ProjectImage = styled(motion.img)`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%);
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  ${ProjectCard}:hover & {
+    transform: scale(1.05);
+  }
+`;
+
+const ProjectInfo = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-`;
-
-const ProjectText = styled.div`
-  flex: 1;
-`;
-
-const ProjectTitle = styled.h2`
-  font-size: 3.5rem;
-  font-weight: 300;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
-  transition: color 0.3s ease;
-  
-  @media (max-width: 768px) {
-    font-size: 2.5rem;
-  }
+  align-items: baseline;
   
   @media (max-width: 480px) {
-    font-size: 2rem;
+    flex-direction: column;
+    gap: 0.25rem;
   }
 `;
 
-const ProjectCategory = styled.p`
-  color: #666;
-  font-size: 1rem;
+const ProjectTitle = styled.h3`
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: #fff;
+  margin: 0;
+  letter-spacing: 0.01em;
+  transition: color 0.3s ease;
+  
+  ${ProjectCard}:hover & {
+    color: #888;
+  }
+`;
+
+const ProjectCategory = styled.span`
+  font-size: 0.75rem;
+  color: #555;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-weight: 300;
-  transition: color 0.3s ease;
-`;
-
-const ProjectYear = styled.div`
-  color: #666;
-  font-size: 1rem;
-  font-weight: 300;
-  
-  @media (max-width: 768px) {
-    align-self: flex-end;
-  }
-`;
-
-const ProjectImage = styled(motion.div)`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
-  width: 400px;
-  height: 300px;
-  background-size: cover;
-  background-position: center;
-  border-radius: 8px;
-  opacity: 0;
-  pointer-events: none;
-  z-index: 10;
-  
-  @media (max-width: 768px) {
-    width: 300px;
-    height: 200px;
-  }
 `;
 
 const ProjectGallery = () => {
@@ -115,13 +109,13 @@ const ProjectGallery = () => {
       title: "Architecture Visualization",
       category: "3D Design",
       year: "2024",
-      image: "https://picsum.photos/800/600?random=101",
+      image: "https://picsum.photos/800/600?grayscale&random=101",
       description: "Una exploración visual de espacios arquitectónicos modernos utilizando técnicas avanzadas de renderizado 3D. Este proyecto combina realismo fotográfico con elementos artísticos para crear visualizaciones que inspiran y comunican la esencia de cada espacio.",
       images: [
-        "https://picsum.photos/1200/800?random=201",
-        "https://picsum.photos/1200/800?random=202",
-        "https://picsum.photos/1200/800?random=203",
-        "https://picsum.photos/1200/800?random=204"
+        "https://picsum.photos/1200/800?grayscale&random=201",
+        "https://picsum.photos/1200/800?grayscale&random=202",
+        "https://picsum.photos/1200/800?grayscale&random=203",
+        "https://picsum.photos/1200/800?grayscale&random=204"
       ],
       video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     },
@@ -130,12 +124,12 @@ const ProjectGallery = () => {
       title: "Product Experience", 
       category: "Web Development",
       year: "2024",
-      image: "https://picsum.photos/800/600?random=102",
+      image: "https://picsum.photos/800/600?grayscale&random=102",
       description: "Plataforma web interactiva diseñada para mostrar productos de manera inmersiva. La experiencia combina diseño minimalista con interacciones fluidas que guían al usuario a través de un viaje visual único.",
       images: [
-        "https://picsum.photos/1200/800?random=205",
-        "https://picsum.photos/1200/800?random=206",
-        "https://picsum.photos/1200/800?random=207"
+        "https://picsum.photos/1200/800?grayscale&random=205",
+        "https://picsum.photos/1200/800?grayscale&random=206",
+        "https://picsum.photos/1200/800?grayscale&random=207"
       ],
       video: null
     },
@@ -144,14 +138,14 @@ const ProjectGallery = () => {
       title: "Brand Identity",
       category: "Branding",
       year: "2023", 
-      image: "https://picsum.photos/800/600?random=103",
+      image: "https://picsum.photos/800/600?grayscale&random=103",
       description: "Desarrollo de identidad visual completa para una marca emergente. El proceso incluyó investigación, conceptualización y aplicación de la marca en múltiples touchpoints, creando una experiencia cohesiva y memorable.",
       images: [
-        "https://picsum.photos/1200/800?random=208",
-        "https://picsum.photos/1200/800?random=209",
-        "https://picsum.photos/1200/800?random=210",
-        "https://picsum.photos/1200/800?random=211",
-        "https://picsum.photos/1200/800?random=212"
+        "https://picsum.photos/1200/800?grayscale&random=208",
+        "https://picsum.photos/1200/800?grayscale&random=209",
+        "https://picsum.photos/1200/800?grayscale&random=210",
+        "https://picsum.photos/1200/800?grayscale&random=211",
+        "https://picsum.photos/1200/800?grayscale&random=212"
       ],
       video: null
     },
@@ -160,27 +154,13 @@ const ProjectGallery = () => {
       title: "Interactive Platform",
       category: "Development",
       year: "2023",
-      image: "https://picsum.photos/800/600?random=104",
+      image: "https://picsum.photos/800/600?grayscale&random=104",
       description: "Plataforma interactiva que permite a los usuarios explorar contenido de manera innovadora. Utilizando tecnologías web modernas, creamos una experiencia fluida y responsiva que se adapta a diferentes dispositivos.",
       images: [
-        "https://picsum.photos/1200/800?random=213",
-        "https://picsum.photos/1200/800?random=214"
+        "https://picsum.photos/1200/800?grayscale&random=213",
+        "https://picsum.photos/1200/800?grayscale&random=214"
       ],
       video: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    },
-    {
-      id: 5,
-      title: "Motion Graphics",
-      category: "Animation",
-      year: "2023",
-      image: "https://picsum.photos/800/600?random=105",
-      description: "Serie de animaciones motion graphics que combinan elementos gráficos con narrativa visual. Cada pieza está diseñada para comunicar conceptos complejos de manera clara y atractiva.",
-      images: [
-        "https://picsum.photos/1200/800?random=215",
-        "https://picsum.photos/1200/800?random=216",
-        "https://picsum.photos/1200/800?random=217"
-      ],
-      video: null
     }
   ];
 
@@ -195,36 +175,39 @@ const ProjectGallery = () => {
   return (
     <>
       <GallerySection id="proyectos">
-        <ProjectList>
+        <GalleryHeader
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <SectionTitle>Proyectos</SectionTitle>
+        </GalleryHeader>
+        
+        <GalleryGrid>
           {projects.map((project, index) => (
-            <ProjectItem
+            <ProjectCard
               key={project.id}
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ backgroundColor: '#111' }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              viewport={{ once: true, margin: "-50px" }}
               onClick={() => handleProjectClick(project)}
             >
-              <ProjectLink>
-                <ProjectContent>
-                  <ProjectText>
-                    <ProjectTitle>{project.title}</ProjectTitle>
-                    <ProjectCategory>{project.category}</ProjectCategory>
-                  </ProjectText>
-                  <ProjectYear>{project.year}</ProjectYear>
-                </ProjectContent>
-              </ProjectLink>
-              
-              <ProjectImage
-                style={{ backgroundImage: `url(${project.image})` }}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileHover={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              />
-            </ProjectItem>
+              <ImageContainer>
+                <ProjectImage 
+                  src={project.image} 
+                  alt={project.title}
+                  loading="lazy"
+                />
+              </ImageContainer>
+              <ProjectInfo>
+                <ProjectTitle>{project.title}</ProjectTitle>
+                <ProjectCategory>{project.category}</ProjectCategory>
+              </ProjectInfo>
+            </ProjectCard>
           ))}
-        </ProjectList>
+        </GalleryGrid>
       </GallerySection>
 
       {selectedProject && (

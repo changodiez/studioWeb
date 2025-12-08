@@ -8,7 +8,7 @@ const Overlay = styled(motion.div)`
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.95);
+  background: #0a0a0a;
   z-index: 2000;
   overflow-y: auto;
   overflow-x: hidden;
@@ -17,7 +17,7 @@ const Overlay = styled(motion.div)`
 const ModalContainer = styled(motion.div)`
   min-height: 100vh;
   padding: 6rem 2rem 4rem;
-  max-width: 1400px;
+  max-width: 1000px;
   margin: 0 auto;
   
   @media (max-width: 768px) {
@@ -32,85 +32,84 @@ const CloseButton = styled(motion.button)`
   background: transparent;
   border: 1px solid #333;
   color: #fff;
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   z-index: 2001;
   transition: all 0.3s ease;
   
   &:hover {
-    border-color: #fff;
-    background: rgba(255, 255, 255, 0.05);
+    border-color: #666;
+    background: rgba(255, 255, 255, 0.03);
   }
   
   @media (max-width: 768px) {
     top: 1.5rem;
     right: 1.5rem;
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
   }
 `;
 
 const Header = styled.div`
-  margin-bottom: 4rem;
+  margin-bottom: 3rem;
   
   @media (max-width: 768px) {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 `;
 
 const Title = styled(motion.h1)`
-  font-size: 4rem;
+  font-size: 2.5rem;
   font-weight: 300;
   margin-bottom: 1rem;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   line-height: 1.1;
+  color: #fff;
   
   @media (max-width: 768px) {
-    font-size: 2.5rem;
+    font-size: 1.75rem;
   }
 `;
 
 const Meta = styled(motion.div)`
   display: flex;
   gap: 2rem;
-  color: #666;
-  font-size: 0.9rem;
+  color: #555;
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   margin-bottom: 2rem;
   
   @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 0.5rem;
+    gap: 1.5rem;
   }
 `;
 
 const Description = styled(motion.p)`
-  font-size: 1.1rem;
+  font-size: 1rem;
   line-height: 1.8;
-  color: #ccc;
-  max-width: 800px;
+  color: #888;
+  max-width: 700px;
   font-weight: 300;
   
   @media (max-width: 768px) {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 `;
 
 const ContentSection = styled.div`
-  margin-bottom: 4rem;
+  margin-bottom: 3rem;
 `;
 
 const VideoContainer = styled(motion.div)`
   width: 100%;
-  margin-bottom: 4rem;
-  border-radius: 8px;
+  margin-bottom: 3rem;
   overflow: hidden;
   background: #111;
   
@@ -118,49 +117,30 @@ const VideoContainer = styled(motion.div)`
     width: 100%;
     height: auto;
     display: block;
+    filter: grayscale(100%);
   }
   
   @media (max-width: 768px) {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 `;
 
 const ImageGallery = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  margin-bottom: 4rem;
-  
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    margin-bottom: 3rem;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 `;
 
-const GalleryImage = styled(motion.div)`
+const GalleryImage = styled(motion.img)`
   width: 100%;
-  aspect-ratio: 16 / 10;
-  background-size: cover;
-  background-position: center;
-  border-radius: 8px;
-  overflow: hidden;
+  height: auto;
+  display: block;
+  filter: grayscale(100%);
   cursor: pointer;
-  position: relative;
+  transition: filter 0.3s ease;
   
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0);
-    transition: background 0.3s ease;
-  }
-  
-  &:hover::after {
-    background: rgba(0, 0, 0, 0.2);
+  &:hover {
+    filter: grayscale(80%);
   }
 `;
 
@@ -170,7 +150,7 @@ const FullImageModal = styled(motion.div)`
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.98);
+  background: rgba(0, 0, 0, 0.95);
   z-index: 3000;
   display: flex;
   align-items: center;
@@ -183,20 +163,22 @@ const FullImage = styled.img`
   max-width: 100%;
   max-height: 90vh;
   object-fit: contain;
-  border-radius: 8px;
+  filter: grayscale(100%);
 `;
 
 const ProjectDetail = ({ project, onClose }) => {
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-    // Prevenir scroll del body cuando el modal está abierto
     document.body.style.overflow = 'hidden';
     
-    // Cerrar con la tecla Escape
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
-        onClose();
+        if (selectedImage) {
+          setSelectedImage(null);
+        } else {
+          onClose();
+        }
       }
     };
     
@@ -206,7 +188,7 @@ const ProjectDetail = ({ project, onClose }) => {
       document.body.style.overflow = 'unset';
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [onClose]);
+  }, [onClose, selectedImage]);
 
   if (!project) return null;
 
@@ -216,44 +198,43 @@ const ProjectDetail = ({ project, onClose }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        onClick={onClose}
+        transition={{ duration: 0.3 }}
       >
         <ModalContainer
-          initial={{ y: 50, opacity: 0 }}
+          initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 50, opacity: 0 }}
-          transition={{ duration: 0.5 }}
-          onClick={(e) => e.stopPropagation()}
+          exit={{ y: 30, opacity: 0 }}
+          transition={{ duration: 0.4, delay: 0.1 }}
         >
           <CloseButton
             onClick={onClose}
-            whileHover={{ scale: 1.1, rotate: 90 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             ×
           </CloseButton>
 
           <Header>
             <Title
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
               {project.title}
             </Title>
             <Meta
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.25 }}
             >
               <span>{project.category}</span>
               <span>{project.year}</span>
             </Meta>
             {project.description && (
               <Description
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
+                transition={{ delay: 0.3 }}
               >
                 {project.description}
               </Description>
@@ -263,9 +244,9 @@ const ProjectDetail = ({ project, onClose }) => {
           {project.video && (
             <ContentSection>
               <VideoContainer
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+                transition={{ delay: 0.35 }}
               >
                 {project.video.includes('youtube.com') || project.video.includes('youtu.be') ? (
                   <iframe
@@ -293,12 +274,13 @@ const ProjectDetail = ({ project, onClose }) => {
                 {project.images.map((image, index) => (
                   <GalleryImage
                     key={index}
-                    style={{ backgroundImage: `url(${image})` }}
-                    initial={{ opacity: 0, y: 30 }}
+                    src={image}
+                    alt={`${project.title} - ${index + 1}`}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 + index * 0.1 }}
+                    transition={{ delay: 0.4 + index * 0.05 }}
                     onClick={() => setSelectedImage(image)}
-                    whileHover={{ scale: 1.02 }}
+                    loading="lazy"
                   />
                 ))}
               </ImageGallery>
@@ -328,4 +310,3 @@ const ProjectDetail = ({ project, onClose }) => {
 };
 
 export default ProjectDetail;
-
