@@ -5,6 +5,9 @@ import styled from 'styled-components';
 const LayoutContainer = styled.div`
   min-height: 100vh;
   position: relative;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 `;
 
 const Header = styled(motion.header)`

@@ -11,6 +11,7 @@ export const GlobalStyle = createGlobalStyle`
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
   }
 
   body {
@@ -20,6 +21,14 @@ export const GlobalStyle = createGlobalStyle`
     overflow-x: hidden;
     line-height: 1.6;
     font-weight: 300;
+    width: 100%;
+    min-height: 100vh;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #root {
+    overflow-x: hidden;
+    width: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -69,5 +78,13 @@ export const GlobalStyle = createGlobalStyle`
   ::selection {
     background: #333;
     color: #fff;
+  }
+
+  /* Canvas fix para móvil */
+  canvas {
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
 `;

@@ -5,8 +5,10 @@ import ProjectDetail from './ProjectDetail';
 
 const GallerySection = styled.section`
   width: 100%;
+  max-width: 100vw;
   background: #0a0a0a;
   padding: 8rem 2rem;
+  overflow-x: hidden;
   
   @media (max-width: 768px) {
     padding: 4rem 1rem;

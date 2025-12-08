@@ -116,11 +116,12 @@ function App() {
           ref={heroRef}
           id="inicio" 
           style={{ 
-            width: '100vw', 
+            width: '100%', 
             height: '100vh', 
             position: 'relative',
             background: '#0a0a0a',
-            touchAction: isMobile && !canScroll ? 'none' : 'pan-y'
+            touchAction: isMobile && !canScroll ? 'none' : 'pan-y',
+            overflow: 'hidden'
           }}
         >
           <Canvas camera={{ position: [0, 0, 3] }}>
