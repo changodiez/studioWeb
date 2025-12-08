@@ -28,10 +28,13 @@ function App() {
 
   // Controlar scroll en móvil
   useEffect(() => {
+    const canvas = document.querySelector('canvas');
+    
     if (!isMobile) {
       document.body.style.overflow = 'auto';
       document.body.style.touchAction = 'auto';
       document.documentElement.style.overflow = 'auto';
+      if (canvas) canvas.style.touchAction = 'auto';
       return;
     }
 
@@ -39,16 +42,19 @@ function App() {
       document.body.style.overflow = 'auto';
       document.body.style.touchAction = 'auto';
       document.documentElement.style.overflow = 'auto';
+      if (canvas) canvas.style.touchAction = 'auto';
     } else {
       document.body.style.overflow = 'hidden';
       document.body.style.touchAction = 'none';
       document.documentElement.style.overflow = 'hidden';
+      if (canvas) canvas.style.touchAction = 'none';
     }
 
     return () => {
       document.body.style.overflow = 'auto';
       document.body.style.touchAction = 'auto';
       document.documentElement.style.overflow = 'auto';
+      if (canvas) canvas.style.touchAction = 'auto';
     };
   }, [canScroll, isMobile]);
 
@@ -240,7 +246,7 @@ function App() {
                     fontSize: '0.7rem', 
                     letterSpacing: '0.05em'
                   }}>
-                    Desbloqueado
+                    Desbloqueado · scroll para descubrir
                   </span>
                   <motion.span
                     animate={{ y: [0, 3, 0] }}
@@ -257,6 +263,46 @@ function App() {
               )}
             </AnimatePresence>
           </div>
+
+          {/* Indicador scroll desktop */}
+          {!isMobile && (
+            <motion.div
+              style={{
+                position: 'absolute',
+                bottom: '2rem',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.5rem',
+                pointerEvents: 'none',
+                zIndex: 10
+              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2, duration: 0.8 }}
+            >
+              <span style={{ 
+                color: '#555',
+                fontSize: '0.7rem', 
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase'
+              }}>
+                Scroll para descubrir
+              </span>
+              <motion.span
+                animate={{ y: [0, 6, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                style={{ 
+                  color: '#444',
+                  fontSize: '1.2rem'
+                }}
+              >
+                ↓
+              </motion.span>
+            </motion.div>
+          )}
 
         </section>
 

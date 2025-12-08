@@ -82,7 +82,6 @@ export const GlobalStyle = createGlobalStyle`
 
   /* Canvas fix para móvil */
   canvas {
-    touch-action: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
