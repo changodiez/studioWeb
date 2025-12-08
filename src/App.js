@@ -67,7 +67,7 @@ function App() {
     }
   }, [isBurned, isMobile]);
 
-  // Detectar cuando el usuario vuelve al top
+  // Detectar cuando el usuario vuelve al top o navega con el menú
   useEffect(() => {
     const handleScroll = () => {
       const scrollTop = window.scrollY;
@@ -76,6 +76,7 @@ function App() {
       
       setIsAtTop(nowAtTop);
       
+      // Si vuelve al top, reiniciar el juego
       if (nowAtTop && !wasAtTop && isMobile) {
         setCanScroll(false);
         setIsBurned(false);
@@ -83,9 +84,38 @@ function App() {
       }
     };
 
+    // Detectar navegación por hash (menú hamburguesa)
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      // Si navega a cualquier sección que no sea inicio, desbloquear scroll
+      if (hash && hash !== '#inicio' && isMobile && !canScroll) {
+        setCanScroll(true);
+        setHasInteracted(true);
+      }
+    };
+
+    // También detectar clicks en links de navegación
+    const handleNavClick = (e) => {
+      const target = e.target.closest('a[href^="#"]');
+      if (target && isMobile) {
+        const hash = target.getAttribute('href');
+        if (hash && hash !== '#inicio') {
+          setCanScroll(true);
+          setHasInteracted(true);
+        }
+      }
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isAtTop, isMobile]);
+    window.addEventListener('hashchange', handleHashChange);
+    document.addEventListener('click', handleNavClick);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('hashchange', handleHashChange);
+      document.removeEventListener('click', handleNavClick);
+    };
+  }, [isAtTop, isMobile, canScroll]);
 
   // Ocultar indicador después de primera interacción
   useEffect(() => {
