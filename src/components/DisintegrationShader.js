@@ -138,7 +138,30 @@ const renderFragment = `
   uniform sampler2D uDensity;
   uniform float uTime;
   uniform float uShowNext;
+  uniform vec2 uResolution;
+  uniform vec2 uTextureResolution;
   varying vec2 vUv;
+  
+  // Función para calcular UVs tipo "cover" (como object-fit: cover en CSS)
+  vec2 getCoverUV(vec2 uv, vec2 screenRes, vec2 texRes) {
+    float screenAspect = screenRes.x / screenRes.y;
+    float textureAspect = texRes.x / texRes.y;
+    
+    vec2 scale = vec2(1.0);
+    vec2 offset = vec2(0.0);
+    
+    if (screenAspect > textureAspect) {
+      // Pantalla más ancha que textura - escalar por ancho
+      scale.y = textureAspect / screenAspect;
+      offset.y = (1.0 - scale.y) * 0.5;
+    } else {
+      // Pantalla más alta que textura - escalar por alto
+      scale.x = screenAspect / textureAspect;
+      offset.x = (1.0 - scale.x) * 0.5;
+    }
+    
+    return uv * scale + offset;
+  }
   
   void main() {
     vec2 uv = vUv;
@@ -148,12 +171,15 @@ const renderFragment = `
     vec2 distortedUv = uv - vel * 0.2;
     distortedUv = clamp(distortedUv, 0.001, 0.999);
     
+    // Calcular UVs para hacer "cover" de la imagen
+    vec2 coverUv = getCoverUV(distortedUv, uResolution, uTextureResolution);
+    
     // Imagen actual
-    vec4 texColor = texture2D(uTexture, distortedUv);
+    vec4 texColor = texture2D(uTexture, coverUv);
     float gray = dot(texColor.rgb, vec3(0.299, 0.587, 0.114));
     
     // Siguiente imagen (se revela cuando uShowNext > 0)
-    vec4 nextTexColor = texture2D(uNextTexture, distortedUv);
+    vec4 nextTexColor = texture2D(uNextTexture, coverUv);
     float nextGray = dot(nextTexColor.rgb, vec3(0.299, 0.587, 0.114));
     
     float velMag = length(vel);
@@ -184,9 +210,19 @@ const getRandomImageUrl = () => {
   return `https://picsum.photos/1920/1080?grayscale&random=${randomId}&t=${Date.now()}`;
 };
 
-const DisintegrationShader = ({ position = [0, 0, 0], scale = 1, onBurnedChange, disableTouch = false }) => {
+const DisintegrationShader = ({ position = [0, 0, 0], onBurnedChange, disableTouch = false }) => {
   const meshRef = useRef();
-  const { camera, gl } = useThree();
+  const { camera, gl, size } = useThree();
+  
+  // Calcular dimensiones del plano para cubrir toda la pantalla
+  const planeSize = useMemo(() => {
+    const distance = 3; // Distancia de la cámara (z=3)
+    const fov = 75 * (Math.PI / 180); // FOV por defecto de R3F
+    const height = 2 * distance * Math.tan(fov / 2);
+    const width = height * (size.width / size.height);
+    // Añadir un pequeño margen para asegurar cobertura completa
+    return { width: width * 1.1, height: height * 1.1 };
+  }, [size.width, size.height]);
   
   const [mouseUV, setMouseUV] = useState([0.5, 0.5]);
   const [isMouseOver, setIsMouseOver] = useState(false);
@@ -374,12 +410,21 @@ const DisintegrationShader = ({ position = [0, 0, 0], scale = 1, onBurnedChange,
     uDensity: { value: densityRT[0].texture },
     uTime: { value: 0 },
     uShowNext: { value: 0 },
+    uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+    uTextureResolution: { value: new THREE.Vector2(1920, 1080) },
   });
 
   // Actualizar texturas en uniforms
   useEffect(() => {
     if (currentTexture) {
       renderUniforms.current.uTexture.value = currentTexture;
+      // Actualizar resolución de la textura
+      if (currentTexture.image) {
+        renderUniforms.current.uTextureResolution.value.set(
+          currentTexture.image.width || 1920,
+          currentTexture.image.height || 1080
+        );
+      }
     }
   }, [currentTexture]);
 
@@ -388,6 +433,11 @@ const DisintegrationShader = ({ position = [0, 0, 0], scale = 1, onBurnedChange,
       renderUniforms.current.uNextTexture.value = nextTexture;
     }
   }, [nextTexture]);
+
+  // Actualizar resolución cuando cambia el tamaño de la ventana
+  useEffect(() => {
+    renderUniforms.current.uResolution.value.set(size.width, size.height);
+  }, [size.width, size.height]);
 
   const velIdx = useRef(0);
   const denIdx = useRef(0);
@@ -595,8 +645,8 @@ const DisintegrationShader = ({ position = [0, 0, 0], scale = 1, onBurnedChange,
   }
 
   return (
-    <mesh ref={meshRef} position={position} scale={scale}>
-      <planeGeometry args={[2, 2, 1, 1]} />
+    <mesh ref={meshRef} position={position}>
+      <planeGeometry args={[planeSize.width, planeSize.height, 1, 1]} />
       <shaderMaterial
         vertexShader={renderVertex}
         fragmentShader={renderFragment}

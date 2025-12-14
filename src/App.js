@@ -187,7 +187,7 @@ function App() {
         >
           {!webglError ? (
             <Canvas 
-              camera={{ position: [0, 0, 3] }}
+              camera={{ position: [0, 0, 3], fov: 75 }}
               gl={{ 
                 antialias: true,
                 alpha: false,
@@ -204,7 +204,6 @@ function App() {
             >
               <DisintegrationShader 
                 key={shaderKey}
-                scale={2.2} 
                 onBurnedChange={handleBurnedChange}
                 disableTouch={isMobile && canScroll}
               />
