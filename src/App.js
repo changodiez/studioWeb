@@ -13,6 +13,7 @@ function App() {
   const [canScroll, setCanScroll] = useState(false);
   const [isAtTop, setIsAtTop] = useState(true);
   const [shaderKey, setShaderKey] = useState(0);
+  const [webglError, setWebglError] = useState(false);
   
   const heroRef = useRef(null);
 
@@ -58,14 +59,15 @@ function App() {
     };
   }, [canScroll, isMobile]);
 
-  // Cuando se quema, habilitar scroll (en móvil)
+  // Cuando se quema o hay error de WebGL, habilitar scroll (en móvil)
   useEffect(() => {
-    if (isBurned && isMobile) {
+    if ((isBurned || webglError) && isMobile) {
       setTimeout(() => {
         setCanScroll(true);
+        setHasInteracted(true);
       }, 500);
     }
-  }, [isBurned, isMobile]);
+  }, [isBurned, isMobile, webglError]);
 
   // Detectar cuando el usuario vuelve al top o navega con el menú
   useEffect(() => {
@@ -174,14 +176,52 @@ function App() {
             overflowX: 'hidden'
           }}
         >
-          <Canvas camera={{ position: [0, 0, 3] }}>
-            <DisintegrationShader 
-              key={shaderKey}
-              scale={2.2} 
-              onBurnedChange={handleBurnedChange}
-              disableTouch={isMobile && canScroll}
-            />
-          </Canvas>
+          {!webglError ? (
+            <Canvas 
+              camera={{ position: [0, 0, 3] }}
+              gl={{ 
+                antialias: true,
+                alpha: false,
+                powerPreference: 'high-performance',
+                preserveDrawingBuffer: true
+              }}
+              style={{ touchAction: isMobile && !canScroll ? 'none' : 'auto' }}
+              onCreated={({ gl }) => {
+                // Verificar si el contexto se creó correctamente
+                if (!gl || !gl.getContext()) {
+                  setWebglError(true);
+                }
+              }}
+            >
+              <DisintegrationShader 
+                key={shaderKey}
+                scale={2.2} 
+                onBurnedChange={handleBurnedChange}
+                disableTouch={isMobile && canScroll}
+              />
+            </Canvas>
+          ) : (
+            // Fallback para cuando WebGL no funciona
+            <div style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: '#0a0a0a'
+            }}>
+              <img 
+                src="https://picsum.photos/1920/1080?grayscale" 
+                alt="Hero"
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '100%',
+                  objectFit: 'cover',
+                  filter: 'grayscale(1)'
+                }}
+              />
+            </div>
+          )}
           
           {/* Texto Hero */}
           <motion.div

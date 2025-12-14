@@ -221,15 +221,21 @@ const DisintegrationShader = ({ position = [0, 0, 0], scale = 1, onBurnedChange,
   // Cargar una textura
   const loadTexture = useCallback((url) => {
     return new Promise((resolve, reject) => {
+      // Configurar crossOrigin para permitir cargar imágenes externas
+      textureLoader.current.crossOrigin = 'anonymous';
       textureLoader.current.load(
         url,
         (texture) => {
           texture.minFilter = THREE.LinearFilter;
           texture.magFilter = THREE.LinearFilter;
+          texture.needsUpdate = true;
           resolve(texture);
         },
         undefined,
-        reject
+        (error) => {
+          console.error('Error loading texture:', error);
+          reject(error);
+        }
       );
     });
   }, []);
@@ -279,18 +285,29 @@ const DisintegrationShader = ({ position = [0, 0, 0], scale = 1, onBurnedChange,
     }
   }, [nextTexture, currentTexture, preloadNextImage]);
 
-  const createRT = () => new THREE.WebGLRenderTarget(simSize, simSize, {
+  // Detectar soporte para texturas float (iOS no las soporta bien)
+  const supportsFloat = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('webgl2') || canvas.getContext('webgl');
+    if (!context) return false;
+    
+    const ext = context.getExtension('OES_texture_float');
+    const extLinear = context.getExtension('OES_texture_float_linear');
+    return !!(ext && extLinear);
+  }, []);
+
+  const createRT = useCallback(() => new THREE.WebGLRenderTarget(simSize, simSize, {
     format: THREE.RGBAFormat,
-    type: THREE.FloatType,
+    type: supportsFloat ? THREE.FloatType : THREE.HalfFloatType,
     minFilter: THREE.LinearFilter,
     magFilter: THREE.LinearFilter,
     wrapS: THREE.ClampToEdgeWrapping,
     wrapT: THREE.ClampToEdgeWrapping,
-  });
+  }), [supportsFloat]);
 
-  const velocityRT = useMemo(() => [createRT(), createRT()], []);
-  const densityRT = useMemo(() => [createRT(), createRT()], []);
-  const curlRT = useMemo(() => createRT(), []);
+  const velocityRT = useMemo(() => [createRT(), createRT()], [createRT]);
+  const densityRT = useMemo(() => [createRT(), createRT()], [createRT]);
+  const curlRT = useMemo(() => createRT(), [createRT]);
 
   const simScene = useMemo(() => new THREE.Scene(), []);
   const simCamera = useMemo(() => new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1), []);
