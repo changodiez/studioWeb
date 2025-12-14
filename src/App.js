@@ -14,6 +14,7 @@ function App() {
   const [isAtTop, setIsAtTop] = useState(true);
   const [shaderKey, setShaderKey] = useState(0);
   const [webglError, setWebglError] = useState(false);
+  const [hideIndicator, setHideIndicator] = useState(false);
   
   const heroRef = useRef(null);
 
@@ -78,10 +79,16 @@ function App() {
       
       setIsAtTop(nowAtTop);
       
-      // Si vuelve al top, reiniciar el juego
+      // Si hace scroll hacia abajo, ocultar indicadores
+      if (scrollTop > 50 && isMobile) {
+        setHideIndicator(true);
+      }
+      
+      // Si vuelve al top, reiniciar el juego y mostrar indicadores
       if (nowAtTop && !wasAtTop && isMobile) {
         setCanScroll(false);
         setIsBurned(false);
+        setHideIndicator(false);
         setShaderKey(prev => prev + 1);
       }
     };
@@ -89,10 +96,11 @@ function App() {
     // Detectar navegación por hash (menú hamburguesa)
     const handleHashChange = () => {
       const hash = window.location.hash;
-      // Si navega a cualquier sección que no sea inicio, desbloquear scroll
-      if (hash && hash !== '#inicio' && isMobile && !canScroll) {
+      // Si navega a cualquier sección que no sea inicio, desbloquear scroll y ocultar indicador
+      if (hash && hash !== '#inicio' && isMobile) {
         setCanScroll(true);
         setHasInteracted(true);
+        setHideIndicator(true);
       }
     };
 
@@ -104,6 +112,7 @@ function App() {
         if (hash && hash !== '#inicio') {
           setCanScroll(true);
           setHasInteracted(true);
+          setHideIndicator(true);
         }
       }
     };
@@ -117,7 +126,7 @@ function App() {
       window.removeEventListener('hashchange', handleHashChange);
       document.removeEventListener('click', handleNavClick);
     };
-  }, [isAtTop, isMobile, canScroll]);
+  }, [isAtTop, isMobile]);
 
   // Ocultar indicador después de primera interacción
   useEffect(() => {
@@ -259,7 +268,7 @@ function App() {
           <div style={indicatorWrapperStyle}>
             <AnimatePresence mode="wait">
               {/* Indicador inicial - antes de interactuar */}
-              {isMobile && !hasInteracted && (
+              {isMobile && !hasInteracted && !hideIndicator && (
                 <motion.div
                   key="initial"
                   style={indicatorCardStyle}
@@ -280,7 +289,7 @@ function App() {
               )}
 
               {/* Indicador bloqueado - después de interactuar, antes de quemar */}
-              {isMobile && !canScroll && !isBurned && hasInteracted && (
+              {isMobile && !canScroll && !isBurned && hasInteracted && !hideIndicator && (
                 <motion.div
                   key="locked"
                   style={indicatorCardStyle}
@@ -301,7 +310,7 @@ function App() {
               )}
 
               {/* Indicador desbloqueado - después de quemar */}
-              {isMobile && canScroll && (
+              {isMobile && canScroll && !hideIndicator && (
                 <motion.div
                   key="unlocked"
                   style={indicatorCardStyle}
